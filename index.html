@@ -3,39 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TikTok LIVE - Stream Asli</title>
-    <!-- Font Awesome Icons (untuk icon TikTok) -->
+    <title>LIVE Streaming - Platform Baru</title>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* mencegah teks terpilih, seperti aplikasi */
         }
 
         body {
             background: #000000;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             height: 100vh;
-            width: 100vw;
-            touch-action: pan-x pan-y; /* tetap bisa scroll halus, tapi hindari zoom */
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
         }
 
-        /* Container utama layar LIVE mirip TikTok */
-        .live-container {
+        /* Container untuk setiap slide video */
+        .video-slide {
             position: relative;
             width: 100%;
-            height: 100%;
-            background: #0a0a0a;
+            height: 100vh;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
             overflow: hidden;
+            background: #0a0a0a;
         }
 
-        /* Video background / simulasi live streaming */
-        .video-background {
+        /* Video background */
+        .video-bg {
             position: absolute;
             top: 0;
             left: 0;
@@ -43,10 +45,9 @@
             height: 100%;
             object-fit: cover;
             z-index: 1;
-            filter: brightness(1.05) contrast(1.1);
         }
 
-        /* Overlay gradasi atas & bawah (seperti UI TikTok) */
+        /* Overlay gradasi */
         .gradient-top {
             position: absolute;
             top: 0;
@@ -64,266 +65,250 @@
             left: 0;
             width: 100%;
             height: 35%;
-            background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
             z-index: 2;
             pointer-events: none;
         }
 
-        /* ----- UI Atas (Live badge, viewers, user info) ----- */
-        .top-bar {
+        /* ===== UI Elemen (Desain berbeda dari TikTok) ===== */
+        /* Live Badge - desain diamond/berlian */
+        .live-badge {
             position: absolute;
             top: 50px;
             left: 16px;
-            right: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            pointer-events: auto;
-        }
-
-        .live-badge {
-            background: #ff2a55;
-            padding: 6px 12px;
-            border-radius: 30px;
+            background: linear-gradient(135deg, #7C3AED, #C026D3);
+            padding: 8px 16px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 800;
             font-size: 14px;
             color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
             backdrop-filter: blur(4px);
-            background-color: rgba(255, 42, 85, 0.9);
         }
 
         .live-badge i {
             font-size: 14px;
-            animation: pulse 1.2s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; transform: scale(1);}
-            50% { opacity: 0.6; transform: scale(0.95);}
-            100% { opacity: 1; transform: scale(1);}
+            0%, 100% { opacity: 1; transform: scale(1);}
+            50% { opacity: 0.6; transform: scale(0.9);}
+        }
+
+        /* Viewer Card - desain unik dengan border neon */
+        .viewer-card {
+            position: absolute;
+            top: 50px;
+            right: 16px;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(12px);
+            padding: 8px 18px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            border: 1px solid rgba(124, 58, 237, 0.6);
+            box-shadow: 0 0 10px rgba(124,58,237,0.3);
+        }
+
+        .viewer-icon {
+            background: #7C3AED;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
         }
 
         .viewer-count {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            padding: 6px 12px;
-            border-radius: 30px;
             color: white;
-            font-weight: 600;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 0.5px;
         }
 
-        .viewer-count i {
-            font-size: 12px;
+        .viewer-label {
+            font-size: 11px;
+            color: #c4b5fd;
+            font-weight: 500;
         }
 
-        /* User info kiri bawah */
-        .user-info {
+        /* User Info - desain berbeda (rounded lebih soft) */
+        .user-card {
             position: absolute;
-            bottom: 90px;
+            bottom: 100px;
             left: 16px;
             z-index: 10;
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            padding: 8px 16px 8px 8px;
-            border-radius: 50px;
-            pointer-events: auto;
-            border: 0.5px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(16px);
+            padding: 8px 20px 8px 8px;
+            border-radius: 60px;
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff7a2f, #ff2a55);
+        .avatar-neon {
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 22px;
             color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .user-details {
-            color: white;
+            box-shadow: 0 0 12px rgba(59,130,246,0.5);
         }
 
         .user-name {
             font-weight: 700;
             font-size: 15px;
-            letter-spacing: -0.2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: white;
         }
 
-        .user-name i {
-            color: #20D5EC;
-            font-size: 12px;
+        .user-badge {
+            font-size: 11px;
+            color: #a5f3fc;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .follow-btn {
-            background: #ff2a55;
+            background: #7C3AED;
             border: none;
             color: white;
             font-weight: 700;
-            font-size: 11px;
-            padding: 4px 12px;
-            border-radius: 20px;
+            font-size: 12px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
             margin-left: 8px;
+        }
+
+        /* ===== Tombol Aksi (Desain berbeda dari TikTok) ===== */
+        .action-buttons-custom {
+            position: absolute;
+            bottom: 100px;
+            right: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 10;
+        }
+
+        .action-custom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
             cursor: pointer;
             transition: 0.2s;
         }
 
-        .follow-btn:active {
-            transform: scale(0.96);
-            opacity: 0.8;
+        .action-custom:active {
+            transform: scale(0.92);
         }
 
-        /* Tombol aksi kanan (like, comment, share) */
-        .action-buttons {
-            position: absolute;
-            bottom: 90px;
-            right: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            z-index: 10;
-            pointer-events: auto;
-        }
-
-        .action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: white;
-            text-shadow: 0 1px 3px black;
-            cursor: pointer;
-            transition: 0.1s;
-        }
-
-        .action-item:active {
-            transform: scale(0.9);
-        }
-
-        .action-icon {
+        .icon-circle {
+            width: 50px;
+            height: 50px;
             background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 26px;
             transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Warna berbeda untuk setiap tombol */
+        .like-icon .icon-circle {
+            background: rgba(236, 72, 153, 0.3);
+            border-color: #ec489a;
+        }
+        .comment-icon .icon-circle {
+            background: rgba(6, 182, 212, 0.3);
+            border-color: #06b6d4;
+        }
+        .share-icon .icon-circle {
+            background: rgba(168, 85, 247, 0.3);
+            border-color: #a855f7;
         }
 
         .action-label {
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 2px black;
         }
 
-        /* animasi like */
-        .heart-animation {
-            position: fixed;
-            z-index: 200;
-            pointer-events: none;
-            font-size: 32px;
-            animation: floatUp 1s ease-out forwards;
-        }
-
-        @keyframes floatUp {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(0.5);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-150px) scale(1.5);
-            }
-        }
-
-        /* Komentar (chat live) */
+        /* Chat area */
         .chat-area {
             position: absolute;
-            bottom: 140px;
+            bottom: 150px;
             left: 16px;
             right: 80px;
             z-index: 10;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             pointer-events: none;
             max-height: 200px;
-            overflow-y: hidden;
+            overflow-y: auto;
         }
 
         .chat-message {
-            background: rgba(0,0,0,0.55);
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(12px);
-            padding: 8px 14px;
+            padding: 8px 16px;
             border-radius: 24px;
             width: fit-content;
             max-width: 85%;
             font-size: 13px;
             color: white;
-            font-weight: 500;
-            backdrop-filter: blur(8px);
-            animation: slideIn 0.2s ease;
-            border-left: 3px solid #ff2a55;
-            pointer-events: none;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            border-left: 3px solid #7C3AED;
         }
 
         .chat-username {
             font-weight: 800;
-            color: #ffd966;
+            color: #c084fc;
             margin-right: 8px;
         }
 
-        /* Input komentar (interaksi) */
-        .comment-input-bar {
+        /* Input Komentar */
+        .comment-input {
             position: absolute;
-            bottom: 24px;
+            bottom: 20px;
             left: 16px;
             right: 16px;
-            background: rgba(30,30,35,0.8);
+            background: rgba(20,20,30,0.9);
             backdrop-filter: blur(20px);
-            border-radius: 30px;
+            border-radius: 40px;
             display: flex;
             align-items: center;
-            padding: 4px 8px 4px 16px;
+            padding: 5px 8px 5px 18px;
             gap: 10px;
             z-index: 20;
-            pointer-events: auto;
-            border: 0.5px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(124,58,237,0.5);
         }
 
-        .comment-input-bar input {
+        .comment-input input {
             flex: 1;
             background: transparent;
             border: none;
@@ -331,421 +316,617 @@
             color: white;
             font-size: 14px;
             outline: none;
-            font-weight: 500;
         }
 
-        .comment-input-bar input::placeholder {
-            color: rgba(255,255,255,0.6);
-            font-weight: 400;
+        .comment-input input::placeholder {
+            color: rgba(255,255,255,0.5);
         }
 
         .send-btn {
-            background: #ff2a55;
+            background: linear-gradient(135deg, #7C3AED, #C026D3);
             border: none;
             color: white;
-            padding: 8px 18px;
-            border-radius: 30px;
+            padding: 8px 20px;
+            border-radius: 40px;
             font-weight: bold;
-            font-size: 13px;
             cursor: pointer;
-            transition: 0.2s;
         }
 
-        .send-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Like counter & animasi popup */
+        /* Like counter */
         .like-counter {
             position: absolute;
-            top: 100px;
+            top: 110px;
             right: 70px;
             background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 6px 14px;
-            color: white;
+            backdrop-filter: blur(8px);
+            border-radius: 30px;
+            padding: 5px 14px;
+            color: #f472b6;
             font-weight: bold;
-            font-size: 14px;
             z-index: 10;
             display: flex;
             align-items: center;
             gap: 6px;
-            pointer-events: none;
         }
 
-        /* efek live ping */
-        .live-ping {
-            position: absolute;
-            top: 55px;
-            left: 95px;
+        /* Animasi floating heart */
+        .heart-float {
+            position: fixed;
+            z-index: 200;
+            pointer-events: none;
+            font-size: 32px;
+            animation: floatLove 1s ease-out forwards;
+        }
+
+        @keyframes floatLove {
+            0% { opacity: 1; transform: translateY(0) scale(0.5);}
+            100% { opacity: 0; transform: translateY(-150px) scale(1.3);}
+        }
+
+        /* POPUP MODAL REGISTRASI */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+ backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            max-width: 340px;
+            width: 85%;
+            border-radius: 48px;
+            padding: 32px 24px;
+            text-align: center;
+            border: 1px solid rgba(124,58,237,0.5);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: 0.3s;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            background: linear-gradient(135deg, #7C3AED, #EC489A);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .modal-desc {
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .benefit-list {
+            text-align: left;
+            margin-bottom: 28px;
+            padding-left: 16px;
+        }
+
+        .benefit-list li {
+            color: #a5b4fc;
+            font-size: 13px;
+            margin-bottom: 8px;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .benefit-list li i {
+            color: #fbbf24;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, #7C3AED, #C026D3);
+            border: none;
+            width: 100%;
+            padding: 14px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: 1px solid #4b5563;
+            color: #9ca3af;
+            padding: 10px;
+            width: 100%;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Indicator slide */
+        .slide-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 50;
+        }
+        .dot {
             width: 8px;
             height: 8px;
-            background: #ff2a55;
+            background: rgba(255,255,255,0.4);
             border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(255,42,85,0.7);
-            animation: ping 1.5s infinite;
-            z-index: 11;
+            transition: 0.2s;
+        }
+        .dot.active {
+            background: white;
+            width: 20px;
+            border-radius: 10px;
         }
 
-        @keyframes ping {
-            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(255,42,85,0.7);}
-            70% { transform: scale(2.5); opacity: 0; box-shadow: 0 0 0 10px rgba(255,42,85,0);}
-            100% { transform: scale(1); opacity: 0; }
-        }
-
-        /* pesan notifikasi "New viewer" simulasi */
-        .toast-notify {
-            position: absolute;
-            bottom: 200px;
+        /* Toast */
+        .toast-msg {
+            position: fixed;
+            bottom: 100px;
             left: 16px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             backdrop-filter: blur(12px);
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 40px;
             color: white;
-            font-size: 12px;
-            z-index: 15;
-            animation: fadeOut 3s forwards;
-            pointer-events: none;
-            border-left: 3px solid #20D5EC;
+            font-size: 13px;
+            z-index: 300;
+            animation: toastFade 3s forwards;
+            border-left: 3px solid #7C3AED;
         }
-
-        @keyframes fadeOut {
+        @keyframes toastFade {
             0% { opacity: 1; transform: translateY(0);}
             70% { opacity: 1;}
-            100% { opacity: 0; transform: translateY(-20px); visibility: hidden;}
-        }
-
-        /* responsive */
-        @media (max-width: 600px) {
-            .action-icon { width: 42px; height: 42px; font-size: 22px; }
-            .user-info { bottom: 80px; }
-            .action-buttons { bottom: 80px; gap: 18px; }
-            .chat-area { bottom: 130px; }
-            .like-counter { top: 85px; right: 60px; font-size: 12px; }
+            100% { opacity: 0; transform: translateY(-30px); visibility: hidden;}
         }
     </style>
 </head>
 <body>
 
-<div class="live-container">
-    <!-- Video latar (kita gunakan video sample dari TikTok style / stream contoh) -->
-    <!-- Untuk kesan live asli, gunakan video looping dari asset publik atau stream contoh.
-         Saya gunakan video dari Pexels (demo streamer gamer) yang legal digunakan, namun kita bisa juga gunakan video lokal static.
-         Gunakan video singkat yang terlihat seperti live streaming (orang ngobrol / gaming). 
-         Link ini adalah contoh video Cinematic (bebas hak cipta) dari Pexels, kita embed sebagai background layaknya live -->
-    <video class="video-background" autoplay muted loop playsinline poster="https://images.pexels.com/photos/4491459/pexels-photo-4491459.jpeg">
-        <source src="https://videos.pexels.com/video-files/4019576/4019576-uhd_2732_1440_30fps.mp4" type="video/mp4">
-        Your browser tidak support video.
-    </video>
-
-    <!-- Gradasi -->
-    <div class="gradient-top"></div>
-    <div class="gradient-bottom"></div>
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="live-badge">
-            <i class="fas fa-circle"></i> LIVE
-            <div class="live-ping"></div>
-        </div>
-        <div class="viewer-count" id="viewerCountDisplay">
-            <i class="fas fa-eye"></i> <span id="viewerCount">1.2K</span>
-        </div>
-    </div>
-
-    <!-- User Info -->
-    <div class="user-info">
-        <div class="avatar">
-            <i class="fab fa-tiktok"></i>
-        </div>
-        <div class="user-details">
-            <div class="user-name">
-                @streamerina_live <i class="fas fa-check-circle" style="color:#20D5EC;"></i>
-                <button class="follow-btn" id="followBtn">Follow</button>
-            </div>
-            <div style="font-size: 11px; opacity:0.8;">⚡ 34.6K pengikut</div>
-        </div>
-    </div>
-
-    <!-- Like Counter -->
-    <div class="like-counter">
-        <i class="fas fa-heart" style="color:#ff2a55;"></i> <span id="likeTotal">4.2K</span>
-    </div>
-
-    <!-- Aksi Kanan -->
-    <div class="action-buttons">
-        <div class="action-item" id="likeBtn">
-            <div class="action-icon"><i class="fas fa-heart"></i></div>
-            <div class="action-label">Suka</div>
-        </div>
-        <div class="action-item" id="commentBtnTrigger">
-            <div class="action-icon"><i class="fas fa-comment-dots"></i></div>
-            <div class="action-label">Komen</div>
-        </div>
-        <div class="action-item" id="shareBtn">
-            <div class="action-icon"><i class="fas fa-share"></i></div>
-            <div class="action-label">Bagikan</div>
-        </div>
-    </div>
-
-    <!-- Chat Messages (Komentar live) -->
-    <div class="chat-area" id="chatArea">
-        <div class="chat-message"><span class="chat-username">❤️ tiktok_fan:</span> seru banget live nya!</div>
-        <div class="chat-message"><span class="chat-username">⭐ devara_23:</span> 🔥🔥🔥</div>
-        <div class="chat-message"><span class="chat-username">🎧 muzic_lover:</span> lagu favoritku dong</div>
-    </div>
-
-    <!-- Input Komentar -->
-    <div class="comment-input-bar">
-        <i class="fas fa-smile-wink" style="color:white; opacity:0.7;"></i>
-        <input type="text" id="commentInput" placeholder="Ketik komentar...">
-        <button class="send-btn" id="sendCommentBtn">Kirim</button>
-    </div>
-</div>
+<div id="app"></div>
 
 <script>
-    // =========== SIMULASI LIVE TIKTOK ASLI ===========
-    // Data dinamis: viewers, likes, daftar komentar
-    let viewerCurrent = 1240;   // 1.2K
-    let likeCurrent = 4280;     // 4.2K
-    let isFollowing = false;
-    let commentsList = [
-        { user: "❤️ tiktok_fan", text: "seru banget live nya!" },
-        { user: "⭐ devara_23", text: "🔥🔥🔥" },
-        { user: "🎧 muzic_lover", text: "lagu favoritku dong" }
+    // Data video slides (3 video berbeda dengan style live berbeda)
+    const videos = [
+        {
+            src: "https://videos.pexels.com/video-files/4019576/4019576-uhd_2732_1440_30fps.mp4",
+            poster: "",
+            username: "@aura_livestream",
+            followers: "28.5K",
+            initialViewers: 1840,
+            initialLikes: 6230,
+            liveTitle: "✨ Special Night"
+        },
+        {
+            src: "https://videos.pexels.com/video-files/855580/855580-hd_1920_1080_30fps.mp4",
+            poster: "",
+            username: "@dj_nexxus",
+            followers: "52.3K",
+            initialViewers: 3210,
+            initialLikes: 12800,
+            liveTitle: "🎧 Live Mix Set"
+        },
+        {
+            src: "https://videos.pexels.com/video-files/3259705/3259705-uhd_2732_1440_30fps.mp4",
+            poster: "",
+            username: "@travelwithme",
+            followers: "19.2K",
+            initialViewers: 950,
+            initialLikes: 3450,
+            liveTitle: "🏔️ Mountain Vibes"
+        }
     ];
 
-    // Update tampilan viewers
-    const viewerSpan = document.getElementById("viewerCount");
-    const likeSpan = document.getElementById("likeTotal");
-    const chatContainer = document.getElementById("chatArea");
+    let currentLikeCounts = [6230, 12800, 3450];
+    let currentViewerCounts = [1840, 3210, 950];
+    let slideIndex = 0;
+    let modalTimeout = null;
+    let modalShown = false;
 
+    // Fungsi helper
     function formatNumber(num) {
-        if (num >= 1000) {
-            return (num / 1000).toFixed(1) + "K";
-        }
+        if (num >= 1000) return (num / 1000).toFixed(1) + "K";
         return num.toString();
     }
 
-    function updateViewerDisplay() {
-        viewerSpan.innerText = formatNumber(viewerCurrent);
-    }
-
-    function updateLikeDisplay() {
-        likeSpan.innerText = formatNumber(likeCurrent);
-    }
-
-    // Fungsi untuk menambah komentar
-    function addChatMessage(username, message) {
-        const msgDiv = document.createElement("div");
-        msgDiv.className = "chat-message";
-        msgDiv.innerHTML = `<span class="chat-username">${escapeHtml(username)}:</span> ${escapeHtml(message)}`;
-        chatContainer.appendChild(msgDiv);
-        // Scroll ke bawah otomatis
-        msgDiv.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        // Batasi jumlah chat max 30 biar tidak penuh
-        while (chatContainer.children.length > 25) {
-            chatContainer.removeChild(chatContainer.firstChild);
-        }
-        // Efek suara simulasi (opsional) tidak pakai audio agar tidak mengganggu
-    }
-
-    // simple escape HTML
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-
-    // Kirim komentar manual
-    function sendComment() {
-        const inputField = document.getElementById("commentInput");
-        let commentText = inputField.value.trim();
-        if (commentText === "") return;
-        // Nama random atau default "penonton"
-        const randomNames = ["🎤 popstar_22", "🐱 catlover", "🔥 gamerX", "💎 diamondqueen", "🎶 musicmania"];
-        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-        const username = randomName;
-        addChatMessage(username, commentText);
-        inputField.value = "";
-        // efek penonton interaksi (bisa naikin like dikit)
-        likeCurrent += Math.floor(Math.random() * 3) + 1;
-        updateLikeDisplay();
-        showFloatingHeart(); // efek like kecil
-    }
-
-    // Floating heart animation ketika like
-    function showFloatingHeart() {
-        const heart = document.createElement('div');
-        heart.className = 'heart-animation';
-        heart.innerHTML = '❤️';
-        heart.style.left = (Math.random() * 70 + 15) + '%';
-        heart.style.bottom = '30%';
-        heart.style.fontSize = (Math.random() * 20 + 24) + 'px';
-        document.body.appendChild(heart);
-        setTimeout(() => { heart.remove(); }, 1000);
-    }
-
-    // Fungsi like dari tombol
-    function addLike() {
-        let increment = Math.floor(Math.random() * 5) + 3; // 3-8 like
-        likeCurrent += increment;
-        updateLikeDisplay();
-
-        // animasi multiple hearts
-        for(let i=0; i< Math.min(increment, 6); i++) {
-            setTimeout(() => showFloatingHeart(), i * 70);
-        }
-        // efek getar ringan (haptic on mobile jika didukung)
-        if (navigator.vibrate) navigator.vibrate(50);
-    }
-
-    // Simulasi viewer naik turun random (Live seperti ramai)
-    function simulateViewerFluctuation() {
-        setInterval(() => {
-            let change = Math.floor(Math.random() * 31) - 10; // -10 sampai +20
-            let newViewer = viewerCurrent + change;
-            if (newViewer < 800) newViewer = 800;
-            if (newViewer > 4500) newViewer = 4500;
-            viewerCurrent = newViewer;
-            updateViewerDisplay();
-
-            // Kadang muncul notifikasi "xx baru bergabung"
-            if (change > 8 && Math.random() > 0.6) {
-                const randomNamesJoin = ["🌸 lily_chan", "🚀 starrynight", "🐼 panda_id", "🎧 djbeat"];
-                const newJoiner = randomNamesJoin[Math.floor(Math.random() * randomNamesJoin.length)];
-                showToastNotif(`${newJoiner} bergabung ke LIVE`);
-            }
-        }, 8000);
-    }
-
-    // Notifikasi toast bergabung
-    function showToastNotif(message) {
+    function showToast(message) {
         const toast = document.createElement('div');
-        toast.className = 'toast-notify';
-        toast.innerHTML = `<i class="fas fa-user-plus"></i> ${message}`;
-        document.querySelector('.live-container').appendChild(toast);
+        toast.className = 'toast-msg';
+        toast.innerHTML = `<i class="fas fa-info-circle" style="margin-right:6px;"></i> ${message}`;
+        document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
 
-    // Simulasi komentar otomatis dari viewers (biar live makin hidup)
-    function autoRandomComments() {
-        const autoMessages = [
-            "🔥 mantap live nya!", "cakep banget streamnya", "❤️❤️❤️", "gas terus kak",
-            "live asli TikTok!", "seru abis", "follow aku dong", "request lagu dong",
-            "🎉🎉🎉", "keren!", "dari mana nih?", "like terus", "semangat!", "wow keren"
-        ];
-        const randomUsers = ["✨ jess_noir", "💫 light_blue", "🐨 koalafied", "🍕 pizza_lover", "🎸 rockstar88"];
-        setInterval(() => {
-            if (Math.random() > 0.45) { // 55% chance muncul komentar setiap 7 detik
-                const randMsg = autoMessages[Math.floor(Math.random() * autoMessages.length)];
-                const randUser = randomUsers[Math.floor(Math.random() * randomUsers.length)];
-                addChatMessage(randUser, randMsg);
-                // komentar juga bisa menambah interaksi like tipis
-                if (Math.random() > 0.7) {
-                    likeCurrent += 1;
-                    updateLikeDisplay();
+    function floatingHeart() {
+        const heart = document.createElement('div');
+        heart.className = 'heart-float';
+        heart.innerHTML = '💜';
+        heart.style.left = Math.random() * 80 + 10 + '%';
+        heart.style.bottom = '20%';
+        heart.style.fontSize = (Math.random() * 20 + 28) + 'px';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+
+    // Render slide video
+    function buildSlides() {
+        const container = document.getElementById('app');
+        container.innerHTML = '';
+        videos.forEach((video, idx) => {
+            const slide = document.createElement('div');
+            slide.className = 'video-slide';
+            slide.setAttribute('data-index', idx);
+            // Video element
+            const videoElem = document.createElement('video');
+            videoElem.className = 'video-bg';
+            videoElem.autoplay = true;
+            videoElem.muted = true;
+            videoElem.loop = true;
+            videoElem.playsInline = true;
+            const source = document.createElement('source');
+            source.src = video.src;
+            source.type = 'video/mp4';
+            videoElem.appendChild(source);
+            // Overlay
+            const gradTop = document.createElement('div'); gradTop.className = 'gradient-top';
+            const gradBottom = document.createElement('div'); gradBottom.className = 'gradient-bottom';
+            slide.appendChild(videoElem);
+            slide.appendChild(gradTop);
+            slide.appendChild(gradBottom);
+            
+            // Live Badge
+            const liveBadge = document.createElement('div');
+            liveBadge.className = 'live-badge';
+            liveBadge.innerHTML = `<i class="fas fa-gem"></i> LIVE · ${video.liveTitle}`;
+            slide.appendChild(liveBadge);
+            
+            // Viewer Card (desain real)
+            const viewerCard = document.createElement('div');
+            viewerCard.className = 'viewer-card';
+            viewerCard.innerHTML = `
+                <div class="viewer-icon"><i class="fas fa-users"></i></div>
+                <div><span class="viewer-count" id="viewer-${idx}">${formatNumber(currentViewerCounts[idx])}</span><span class="viewer-label"> menonton</span></div>
+            `;
+            slide.appendChild(viewerCard);
+            
+            // User Card
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            userCard.innerHTML = `
+                <div class="avatar-neon"><i class="fas fa-microphone-alt"></i></div>
+                <div>
+                    <div class="user-name">${video.username} <span style="font-size:10px;">● LIVE</span></div>
+                    <div class="user-badge"><i class="fas fa-chart-line"></i> ${video.followers} pengikut</div>
+                </div>
+                <button class="follow-btn follow-${idx}">Ikuti</button>
+            `;
+            slide.appendChild(userCard);
+            
+            // Like Counter
+            const likeDiv = document.createElement('div');
+            likeDiv.className = 'like-counter';
+            likeDiv.innerHTML = `<i class="fas fa-heart" style="color:#ec489a;"></i> <span id="like-${idx}">${formatNumber(currentLikeCounts[idx])}</span>`;
+            slide.appendChild(likeDiv);
+            
+            // Action buttons custom
+            const actionBar = document.createElement('div');
+            actionBar.className = 'action-buttons-custom';
+            actionBar.innerHTML = `
+                <div class="action-custom like-action" data-idx="${idx}">
+                    <div class="icon-circle"><i class="fas fa-thumbs-up"></i></div>
+                    <div class="action-label">Suka</div>
+                </div>
+                <div class="action-custom comment-action-custom" data-idx="${idx}">
+                    <div class="icon-circle"><i class="fas fa-message"></i></div>
+                    <div class="action-label">Komen</div>
+                </div>
+                <div class="action-custom share-action-custom" data-idx="${idx}">
+                    <div class="icon-circle"><i class="fas fa-share-nodes"></i></div>
+                    <div class="action-label">Bagikan</div>
+                </div>
+            `;
+            slide.appendChild(actionBar);
+            
+            // Chat area
+            const chatArea = document.createElement('div');
+            chatArea.className = 'chat-area';
+            chatArea.id = `chat-${idx}`;
+            const sampleMsg = document.createElement('div');
+            sampleMsg.className = 'chat-message';
+            sampleMsg.innerHTML = `<span class="chat-username">💜 penonton_setia:</span> live seru banget!`;
+            chatArea.appendChild(sampleMsg);
+            slide.appendChild(chatArea);
+            
+            // Input komentar
+            const inputDiv = document.createElement('div');
+            inputDiv.className = 'comment-input';
+            inputDiv.innerHTML = `
+                <i class="fas fa-smile" style="color:#a78bfa;"></i>
+                <input type="text" placeholder="Tulis komentar..." class="chat-input-${idx}">
+                <button class="send-btn send-${idx}">Kirim</button>
+            `;
+            slide.appendChild(inputDiv);
+            
+            container.appendChild(slide);
+        });
+        
+        attachEvents();
+        startAutoChat();
+        startViewerFluctuation();
+        startAutoLike();
+    }
+    
+    function attachEvents() {
+        // Like button per slide
+        document.querySelectorAll('.like-action').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                if (!isNaN(idx)) {
+                    currentLikeCounts[idx] += Math.floor(Math.random() * 8) + 2;
+                    document.getElementById(`like-${idx}`).innerText = formatNumber(currentLikeCounts[idx]);
+                    for(let i=0;i<3;i++) setTimeout(() => floatingHeart(), i*70);
+                    if (navigator.vibrate) navigator.vibrate(40);
+                    showToast(`👍 +1 Suka untuk ${videos[idx].username}`);
                 }
+            });
+        });
+        
+        // Share button
+        document.querySelectorAll('.share-action-custom').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showToast("🔗 Tautan LIVE disalin! Ajak teman bergabung!");
+                navigator.clipboard?.writeText("https://liveplatform.stream/join");
+            });
+        });
+        
+        // Comment focus
+        document.querySelectorAll('.comment-action-custom').forEach((btn, i) => {
+            btn.addEventListener('click', () => {
+                const slideIdx = btn.getAttribute('data-idx');
+                const inputField = document.querySelector(`.chat-input-${slideIdx}`);
+                if(inputField) inputField.focus();
+            });
+        });
+        
+        // Send comment
+        videos.forEach((_, idx) => {
+            const sendBtn = document.querySelector(`.send-${idx}`);
+            const inputField = document.querySelector(`.chat-input-${idx}`);
+            if(sendBtn && inputField) {
+                const sendFunc = () => {
+                    let text = inputField.value.trim();
+                    if(text === "") return;
+                    const randomNames = ["🌟 starlight", "🎤 vocalist", "💎 gem hunter", "🌀 wave rider", "🔥 blaze"];
+                    const randomUser = randomNames[Math.floor(Math.random() * randomNames.length)];
+                    const chatDiv = document.getElementById(`chat-${idx}`);
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'chat-message';
+                    msgDiv.innerHTML = `<span class="chat-username">${randomUser}:</span> ${escapeHtml(text)}`;
+                    chatDiv.appendChild(msgDiv);
+                    inputField.value = "";
+                    chatDiv.scrollTop = chatDiv.scrollHeight;
+                    while(chatDiv.children.length > 30) chatDiv.removeChild(chatDiv.firstChild);
+                    // increase engagement
+                    currentLikeCounts[idx] += 1;
+                    document.getElementById(`like-${idx}`).innerText = formatNumber(currentLikeCounts[idx]);
+                };
+                sendBtn.addEventListener('click', sendFunc);
+                inputField.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendFunc(); });
             }
-        }, 7000);
-    }
-
-    // Simulasi untuk meningkatkan likes secara gradual (seperti live populer)
-    function autoLikeGradual() {
-        setInterval(() => {
-            if (Math.random() > 0.6) {
-                let inc = Math.floor(Math.random() * 3) + 1;
-                likeCurrent += inc;
-                updateLikeDisplay();
-                if (inc > 1 && Math.random() > 0.5) showFloatingHeart();
+        });
+        
+        // Follow buttons
+        videos.forEach((_, idx) => {
+            const followBtn = document.querySelector(`.follow-${idx}`);
+            if(followBtn) {
+                let followed = false;
+                followBtn.addEventListener('click', () => {
+                    if(!followed) {
+                        followBtn.innerText = "Mengikuti";
+                        followBtn.style.background = "#334155";
+                        showToast(`✅ Berhasil mengikuti ${videos[idx].username}`);
+                    } else {
+                        followBtn.innerText = "Ikuti";
+                        followBtn.style.background = "#7C3AED";
+                        showToast(`❌ Berhenti mengikuti`);
+                    }
+                    followed = !followed;
+                });
             }
-        }, 4000);
-    }
-
-    // Fungsi Share (alert)
-    function shareLive() {
-        alert("✨ Tautan LIVE disalin! Bagikan ke teman-temanmu ✨\n(Simulasi: https://tiktok.com/@streamerina_live)");
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText("https://tiktok.com/@streamerina_live");
-            showToastNotif("Link disalin ke clipboard! Bagikan LIVE!");
-        }
-    }
-
-    // Event follow
-    const followBtn = document.getElementById("followBtn");
-    followBtn.addEventListener("click", () => {
-        if (!isFollowing) {
-            followBtn.innerText = "Following";
-            followBtn.style.background = "#3b3b4a";
-            showToastNotif("✅ Kamu sekarang mengikuti @streamerina_live");
-            isFollowing = true;
-        } else {
-            followBtn.innerText = "Follow";
-            followBtn.style.background = "#ff2a55";
-            showToastNotif("❌ Berhenti mengikuti");
-            isFollowing = false;
-        }
-    });
-
-    // Fokus Input komentar jika klik icon comment
-    document.getElementById("commentBtnTrigger").addEventListener("click", () => {
-        document.getElementById("commentInput").focus();
-    });
-
-    // Tombol Kirim
-    document.getElementById("sendCommentBtn").addEventListener("click", sendComment);
-    document.getElementById("commentInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendComment();
-    });
-
-    // Like button
-    document.getElementById("likeBtn").addEventListener("click", addLike);
-    // Share button
-    document.getElementById("shareBtn").addEventListener("click", shareLive);
-
-    // Load ulang tampilan chat awal
-    function loadInitialChat() {
-        chatContainer.innerHTML = "";
-        commentsList.forEach(c => {
-            addChatMessage(c.user, c.text);
+        });
+        
+        // Double tap like on video container
+        document.querySelectorAll('.video-slide').forEach((slide, idx) => {
+            let lastTap = 0;
+            slide.addEventListener('click', (e) => {
+                if(e.target.closest('.comment-input') || e.target.closest('.action-custom') || e.target.closest('.follow-btn')) return;
+                const now = Date.now();
+                if(now - lastTap < 300) {
+                    currentLikeCounts[idx] += 5;
+                    document.getElementById(`like-${idx}`).innerText = formatNumber(currentLikeCounts[idx]);
+                    for(let i=0;i<5;i++) setTimeout(() => floatingHeart(), i*50);
+                    showToast(`❤️ +5 Suka!`);
+                    lastTap = 0;
+                } else {
+                    lastTap = now;
+                }
+            });
         });
     }
-    loadInitialChat();
-
-    // Jalankan semua simulasi live interaktif
-    simulateViewerFluctuation();
-    autoRandomComments();
-    autoLikeGradual();
-
-    // Tambahkan efek sentuhan di layar untuk like ganda (double tap seperti TikTok)
-    let lastTap = 0;
-    document.querySelector(".live-container").addEventListener("click", (e) => {
-        // double tap di area video (kecuali tombol) akan memberi like
-        const now = Date.now();
-        const isButton = e.target.closest('.action-item') || e.target.closest('.comment-input-bar') || e.target.closest('.follow-btn') || e.target.closest('.send-btn');
-        if (!isButton) {
-            if (now - lastTap < 350) {
-                addLike();
-                addLike(); // like double
-                showFloatingHeart();
-                e.preventDefault();
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Auto chat random
+    function startAutoChat() {
+        setInterval(() => {
+            const activeSlide = getCurrentSlideIndex();
+            const msgs = ["🔥 mantap!", "💜 suka live nya", "✨ kereenn", "🚀 gas terus", "🎉🎉", "ikut dong", "❤️ dari aku"];
+            const randomUser = ["🐼 pandalove", "💫 cosmic", "🍕 pizza", "🎸 rocker", "📷 shooter"];
+            const randMsg = msgs[Math.floor(Math.random() * msgs.length)];
+            const randUser = randomUser[Math.floor(Math.random() * randomUser.length)];
+            const chatDiv = document.getElementById(`chat-${activeSlide}`);
+            if(chatDiv) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message';
+                msgDiv.innerHTML = `<span class="chat-username">${randUser}:</span> ${randMsg}`;
+                chatDiv.appendChild(msgDiv);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+                while(chatDiv.children.length > 30) chatDiv.removeChild(chatDiv.firstChild);
             }
-            lastTap = now;
+        }, 8000);
+    }
+    
+    function getCurrentSlideIndex() {
+        const slides = document.querySelectorAll('.video-slide');
+        const scrollTop = window.scrollY;
+        for(let i=0; i<slides.length; i++) {
+            const rect = slides[i].getBoundingClientRect();
+            if(rect.top >= 0 && rect.top < window.innerHeight/2) return i;
         }
-    });
-
-    // Tampilkan pesan selamat datang di Live
+        return 0;
+    }
+    
+    function startViewerFluctuation() {
+        setInterval(() => {
+            const idx = getCurrentSlideIndex();
+            let change = Math.floor(Math.random() * 41) - 15;
+            let newVal = currentViewerCounts[idx] + change;
+            if(newVal < 300) newVal = 300;
+            if(newVal > 5000) newVal = 5000;
+            currentViewerCounts[idx] = newVal;
+            const viewerSpan = document.getElementById(`viewer-${idx}`);
+            if(viewerSpan) viewerSpan.innerText = formatNumber(newVal);
+        }, 7000);
+    }
+    
+    function startAutoLike() {
+        setInterval(() => {
+            const idx = getCurrentSlideIndex();
+            currentLikeCounts[idx] += Math.floor(Math.random() * 3) + 1;
+            const likeSpan = document.getElementById(`like-${idx}`);
+            if(likeSpan) likeSpan.innerText = formatNumber(currentLikeCounts[idx]);
+        }, 5000);
+    }
+    
+    // Scroll Snap & Indicator
+    function initScrollIndicator() {
+        const slides = document.querySelectorAll('.video-slide');
+        const indicator = document.createElement('div');
+        indicator.className = 'slide-indicator';
+        slides.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.setAttribute('data-dot', i);
+            indicator.appendChild(dot);
+        });
+        document.body.appendChild(indicator);
+        window.addEventListener('scroll', () => {
+            const index = getCurrentSlideIndex();
+            document.querySelectorAll('.dot').forEach((dot, idx) => {
+                if(idx === index) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        });
+    }
+    
+    // POPUP dengan smartlink Adsterra
+    function showRegisterPopup() {
+        if(modalShown) return;
+        const modalHtml = document.createElement('div');
+        modalHtml.className = 'modal-overlay';
+        modalHtml.innerHTML = `
+            <div class="modal-card">
+                <div class="modal-icon"><i class="fas fa-crown"></i></div>
+                <div class="modal-title">Daftar Sekarang!</div>
+                <div class="modal-desc">Dapatkan akses eksklusif & hadiah menarik setiap hari</div>
+                <ul class="benefit-list">
+                    <li><i class="fas fa-gem"></i> Bonus 50.000 Koin untuk pendatang baru</li>
+                    <li><i class="fas fa-chart-line"></i> Streaming tanpa iklan & kualitas HD</li>
+                    <li><i class="fas fa-gift"></i> Voucher merchandise setiap minggu</li>
+                </ul>
+                <button class="register-btn" id="smartlinkRegisterBtn"><i class="fas fa-user-plus"></i> BUAT AKUN GRATIS</button>
+                <button class="close-modal" id="closeModalBtn">Nanti Saja</button>
+            </div>
+        `;
+        document.body.appendChild(modalHtml);
+        setTimeout(() => modalHtml.classList.add('active'), 50);
+        
+        // TOMBOL DAFTAR dengan SMARTLINK ADSTERRA (ganti dengan link smartlink anda)
+        const registerBtn = document.getElementById('smartlinkRegisterBtn');
+        if(registerBtn) {
+            registerBtn.onclick = () => {
+                // GANTI link smartlink adsterra disini!!!
+                const smartlinkUrl = "https://publisher.adsterra.com/redirect/clicks/your-smartlink-here"; 
+                window.open(smartlinkUrl, '_blank');
+                showToast("✨ Mengarahkan ke halaman pendaftaran...");
+                modalHtml.classList.remove('active');
+                setTimeout(() => modalHtml.remove(), 300);
+            };
+        }
+        
+        document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+            modalHtml.classList.remove('active');
+            setTimeout(() => modalHtml.remove(), 300);
+        });
+        modalShown = true;
+    }
+    
+    // inisiasi
+    buildSlides();
+    initScrollIndicator();
+    // Popup muncul antara 5-10 detik
+    const delay = Math.floor(Math.random() * 5000) + 5000; // 5-10 detik
     setTimeout(() => {
-        showToastNotif("👋 Selamat datang di LIVE TikTok!");
-    }, 1500);
+        if(!modalShown) showRegisterPopup();
+    }, delay);
+    
+    // tambahan style scroll snap
+    const style = document.createElement('style');
+    style.textContent = `html { scroll-snap-type: y mandatory; } body { overflow-y: scroll; }`;
+    document.head.appendChild(style);
 </script>
 </body>
 </html>
